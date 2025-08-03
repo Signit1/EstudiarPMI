@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Sistema de Gestión de Proyectos - PMI',
-  description: 'Sistema completo de gestión de proyectos basado en PMI',
+  title: 'Sistema de Estudio PMI - PMBOK 7',
+  description: 'Sistema interactivo para estudiar PMI PMBOK 7',
 }
 
 export default function RootLayout({

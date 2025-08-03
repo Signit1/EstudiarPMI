@@ -1,95 +1,54 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FolderOpen, Users, Calendar, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-react'
-
-interface Project {
-  id: number
-  name: string
-  description: string
-  status: 'active' | 'pending' | 'completed' | 'cancelled'
-  progress: number
-  startDate: string
-  endDate: string
-  team: string[]
-  budget: number
-}
+import { Upload, BookOpen, Search, Brain, Target, Award } from 'lucide-react'
 
 export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'application/pdf') {
+      setPdfFile(file)
+      setIsUploading(true)
+      
+      // Simular carga del PDF
+      setTimeout(() => {
+        setIsUploading(false)
+        setUploadSuccess(true)
+      }, 2000)
+    }
+  }
+
+  const features = [
     {
-      id: 1,
-      name: "Desarrollo de Aplicación Web",
-      description: "Creación de una aplicación web moderna para gestión de clientes",
-      status: 'active',
-      progress: 75,
-      startDate: '2024-01-15',
-      endDate: '2024-06-30',
-      team: ['Ana García', 'Carlos López', 'María Rodríguez'],
-      budget: 50000
+      icon: <BookOpen className="w-6 h-6" />,
+      title: "Carga de PDF",
+      description: "Sube tu guía del PMBOK 7 en PDF para extraer el contenido"
     },
     {
-      id: 2,
-      name: "Migración de Base de Datos",
-      description: "Migración de sistema legacy a nueva arquitectura",
-      status: 'pending',
-      progress: 25,
-      startDate: '2024-03-01',
-      endDate: '2024-08-15',
-      team: ['Juan Pérez', 'Sofia Martín'],
-      budget: 35000
+      icon: <Search className="w-6 h-6" />,
+      title: "Búsqueda Inteligente",
+      description: "Encuentra conceptos específicos rápidamente"
     },
     {
-      id: 3,
-      name: "Implementación de CRM",
-      description: "Despliegue de sistema CRM para ventas",
-      status: 'completed',
-      progress: 100,
-      startDate: '2023-10-01',
-      endDate: '2024-02-28',
-      team: ['Luis Fernández', 'Carmen Ruiz', 'Diego Moreno'],
-      budget: 75000
+      icon: <Brain className="w-6 h-6" />,
+      title: "Herramientas de Estudio",
+      description: "Flashcards, quizzes y resúmenes interactivos"
+    },
+    {
+      icon: <Target className="w-6 h-6" />,
+      title: "Seguimiento de Progreso",
+      description: "Monitorea tu avance en el estudio"
+    },
+    {
+      icon: <Award className="w-6 h-6" />,
+      title: "Certificación PMI",
+      description: "Prepárate para la certificación PMP"
     }
-  ])
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <CheckCircle className="w-4 h-4" />
-      case 'pending':
-        return <Clock className="w-4 h-4" />
-      case 'completed':
-        return <CheckCircle className="w-4 h-4" />
-      case 'cancelled':
-        return <AlertCircle className="w-4 h-4" />
-      default:
-        return <Clock className="w-4 h-4" />
-    }
-  }
-
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'status-active'
-      case 'pending':
-        return 'status-pending'
-      case 'completed':
-        return 'status-completed'
-      case 'cancelled':
-        return 'status-cancelled'
-      default:
-        return 'status-pending'
-    }
-  }
-
-  const stats = {
-    total: projects.length,
-    active: projects.filter(p => p.status === 'active').length,
-    completed: projects.filter(p => p.status === 'completed').length,
-    pending: projects.filter(p => p.status === 'pending').length,
-    totalBudget: projects.reduce((sum, p) => sum + p.budget, 0),
-    avgProgress: projects.reduce((sum, p) => sum + p.progress, 0) / projects.length
-  }
+  ]
 
   return (
     <div className="min-h-screen">
@@ -99,138 +58,117 @@ export default function Home() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-primary-600">Sistema de Gestión de Proyectos</h1>
+                <h1 className="text-2xl font-bold text-primary-600">PMI Study System</h1>
               </div>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="/" className="text-primary-600 font-medium">Dashboard</a>
-              <a href="#" className="text-gray-500 hover:text-primary-600">Proyectos</a>
-              <a href="#" className="text-gray-500 hover:text-primary-600">Equipos</a>
-              <a href="#" className="text-gray-500 hover:text-primary-600">Reportes</a>
+              <a href="/" className="text-primary-600 font-medium">Inicio</a>
+              <a href="/study" className="text-gray-500 hover:text-primary-600">Estudiar</a>
+              <a href="#" className="text-gray-500 hover:text-primary-600">Progreso</a>
+              <a href="#" className="text-gray-500 hover:text-primary-600">Ayuda</a>
             </nav>
-            <button className="btn-primary flex items-center space-x-2">
-              <Plus className="w-4 h-4" />
-              <span>Nuevo Proyecto</span>
-            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FolderOpen className="w-8 h-8 text-primary-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Proyectos</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <CheckCircle className="w-8 h-8 text-success-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Activos</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <TrendingUp className="w-8 h-8 text-warning-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Progreso Promedio</p>
-                <p className="text-2xl font-bold text-gray-900">{Math.round(stats.avgProgress)}%</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Calendar className="w-8 h-8 text-primary-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Presupuesto Total</p>
-                <p className="text-2xl font-bold text-gray-900">${stats.totalBudget.toLocaleString()}</p>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Sistema de Estudio PMI
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Domina el PMBOK 7 con nuestro sistema interactivo. Sube tu guía en PDF y comienza a estudiar de manera eficiente.
+          </p>
+          
+          {/* PDF Upload Section */}
+          <div className="max-w-md mx-auto">
+            <div className="card">
+              <div className="text-center">
+                <Upload className="w-12 h-12 text-primary-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Sube tu PDF del PMBOK 7</h3>
+                <p className="text-gray-600 mb-4">
+                  Arrastra tu archivo PDF aquí o haz clic para seleccionar
+                </p>
+                
+                <label className="btn-primary cursor-pointer inline-block">
+                  Seleccionar PDF
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+                
+                {isUploading && (
+                  <div className="mt-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                    <p className="text-sm text-gray-600 mt-2">Procesando PDF...</p>
+                  </div>
+                )}
+                
+                {uploadSuccess && (
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800 text-sm">¡PDF cargado exitosamente!</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Projects List */}
-        <div className="card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Proyectos Recientes</h2>
-            <button className="btn-secondary">Ver Todos</button>
-          </div>
-
-          <div className="space-y-4">
-            {projects.map((project) => (
-              <div key={project.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{project.name}</h3>
-                    <p className="text-gray-600 mt-1">{project.description}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`status-badge ${getStatusClass(project.status)}`}>
-                      {getStatusIcon(project.status)}
-                      <span className="ml-1 capitalize">{project.status}</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Progreso</p>
-                    <div className="flex items-center mt-1">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                        <div 
-                          className="bg-primary-600 h-2 rounded-full" 
-                          style={{ width: `${project.progress}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-medium">{project.progress}%</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-gray-500">Equipo</p>
-                    <div className="flex items-center mt-1">
-                      <Users className="w-4 h-4 text-gray-400 mr-1" />
-                      <span className="text-sm">{project.team.length} miembros</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-gray-500">Fechas</p>
-                    <p className="text-sm mt-1">{project.startDate} - {project.endDate}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-gray-500">Presupuesto</p>
-                    <p className="text-sm font-medium mt-1">${project.budget.toLocaleString()}</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <button className="btn-secondary">Ver Detalles</button>
-                  <button className="btn-primary">Editar</button>
-                </div>
+        {/* Features Section */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {features.map((feature, index) => (
+            <div key={index} className="card text-center">
+              <div className="text-primary-500 mb-4 flex justify-center">
+                {feature.icon}
               </div>
-            ))}
+              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+              <p className="text-gray-600">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Start Section */}
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            Comienza tu estudio
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center">
+              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-primary-600">1</span>
+              </div>
+              <h3 className="font-semibold mb-2">Sube tu PDF</h3>
+              <p className="text-gray-600 text-sm">Carga tu guía del PMBOK 7</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-primary-600">2</span>
+              </div>
+              <h3 className="font-semibold mb-2">Explora el contenido</h3>
+              <p className="text-gray-600 text-sm">Navega por los conceptos clave</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-primary-600">3</span>
+              </div>
+              <h3 className="font-semibold mb-2">Practica y aprende</h3>
+              <p className="text-gray-600 text-sm">Usa las herramientas de estudio</p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <a 
+              href="/study" 
+              className="btn-primary inline-flex items-center space-x-2"
+            >
+              <Brain className="w-5 h-5" />
+              <span>Ir a Herramientas de Estudio</span>
+            </a>
           </div>
         </div>
       </main>
